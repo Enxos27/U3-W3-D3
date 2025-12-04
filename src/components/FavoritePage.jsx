@@ -1,11 +1,11 @@
 import { Row, Col, Button, Toast } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux'
-import { Trash } from 'lucide-react';
 import { useState } from 'react';
+import { removeFromFavorites } from '../redux/actions';
 
 const FavoritesPage = () => {
      const [show, setShow] = useState(false);
-    const favorites = useSelector((state) => { return state.favorites });
+    const favorites = useSelector((state) => { return state.favorites.favorites });
     const dispatch = useDispatch();
     return (
         <>
@@ -23,13 +23,10 @@ const FavoritesPage = () => {
                 variant="danger"
                 onClick={() => {
                      setShow(true)
-                  dispatch({
-                    type: 'REMOVE_FROM_FAVORITES',
-                    payload: agency, 
-                  })
+                      dispatch(removeFromFavorites(agency))
                 }}
               >
-                <Trash />
+               <i className="bi bi-trash"></i>
               </Button>
                <Toast bg='danger' onClose={() => setShow(false)} show={show} delay={2500} autohide 
                style={{

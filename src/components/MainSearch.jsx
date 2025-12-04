@@ -1,37 +1,42 @@
 import { useState } from "react";
-import { Container, Row, Col, Form } from "react-bootstrap";
+import { Container, Row, Col, Form, Alert } from "react-bootstrap";
 import Job from "./Job";
+import {addJob} from "../redux/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const MainSearch = () => {
   const [query, setQuery] = useState("");
-  const [jobs, setJobs] = useState([]);
-
-  const baseEndpoint = "https://strive-benchmark.herokuapp.com/api/jobs?search=";
-
+    const dispatch = useDispatch()
+     const fetchError = useSelector((state) => {
+    return state.job.error
+  })
+     
   const handleChange = e => {
     setQuery(e.target.value);
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch(baseEndpoint + query + "&limit=20");
-      if (response.ok) {
-        const { data } = await response.json();
-        setJobs(data);
-      } else {
-        alert("Error fetching results");
-      }
-    } catch (error) {
-      console.log(error);
+    // Esegui la dispatch solo quando l'utente preme Invio
+    if (query.length > 0) {
+        dispatch(addJob(query));
     }
-  };
+};
+  
+   const jobs = useSelector((currentState) => {
+    return currentState.job.job 
+  })
 
   return (
     <Container>
       <Row>
-        <Col xs={10} className="mx-auto my-3">
+        {fetchError ? (
+          <>
+          <Alert variant="danger" className="my-5">Errore nel recupero libri</Alert>
+        </>
+        ) : (
+          <>
+         <Col xs={10} className="mx-auto my-3">
           <h1 className="display-1">Remote Jobs Search</h1>
         </Col>
         <Col xs={10} className="mx-auto">
@@ -44,6 +49,9 @@ const MainSearch = () => {
             <Job key={jobData._id} data={jobData} />
           ))}
         </Col>
+        </>
+        )}
+       
       </Row>
     </Container>
   );
